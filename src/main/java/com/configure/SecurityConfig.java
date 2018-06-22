@@ -27,15 +27,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 		.passwordEncoder(passwordEncoder())
 		.usersByUsernameQuery("select emp_id,password, enabled from employee_details where emp_id=?")
 		.authoritiesByUsernameQuery("select emp_id, role from employee_roles where emp_id=?");
-		 
-		
 	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 	    return new BCryptPasswordEncoder();
 	}
-	
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception 
@@ -43,6 +40,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 		http
 			.authorizeRequests()
 			.anyRequest().permitAll().and().httpBasic();
-		
 	}
 }

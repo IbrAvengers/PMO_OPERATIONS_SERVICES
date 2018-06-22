@@ -4,6 +4,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "employee_details")
@@ -21,6 +24,8 @@ public class EmployeeDetailsEntity {
 	private String ibm_mail_id;
 	@Column
 	private String ph_number;
+	@JsonIgnore
+	@Transient
 	@Column
 	private String password;
 

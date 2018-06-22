@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,12 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dao.EmployeeDAO;
 import com.entity.EmployeeDetailsEntity;
+import com.model.EmployeeAllDetails;
 
 @RestController("/")
 public class EmployeeServicesController {
 	@Autowired
 	EmployeeDAO empDAO;
-
+	
+	
 	@RequestMapping(value = "/loginService", method = RequestMethod.GET, produces = { "application/json","application/xml" })
 	public List<String> loginService(HttpServletResponse response, Authentication authentication) {
 		Collection<GrantedAuthority> authorities = null;
@@ -36,37 +39,41 @@ public class EmployeeServicesController {
 			{
 				roles.add(grantedAuthority.getAuthority());
 			}
-
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 		return roles;
-
 	}
 	
-	
-	@RequestMapping(value = "/employees", method = RequestMethod.GET, produces = { "application/json","application/xml" })
-	public  ResponseEntity<List<EmployeeDetailsEntity>> empService() 
+	@RequestMapping(value = "/getemployeealldetails/{empID}", method = RequestMethod.GET, produces = { "application/json","application/xml" })
+	public  ResponseEntity<EmployeeAllDetails> getEmployeeAllDetails(@PathVariable String empID) 
 	{
-		return empDAO.listEmployee();
-	}
-	@RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = { "application/json","application/xml" })
-	public ResponseEntity<EmployeeDetailsEntity> empService(@PathVariable String id) 
-	{
-		return empDAO.getEmployee(id);
-	}
-	@RequestMapping(value = "/managerService", method = RequestMethod.GET, produces = { "application/json","application/xml" })
-	public void managerService() 
-	{
-		System.out.println("Inside Manager");
-	}
-	@RequestMapping(value = "/adminService", method = RequestMethod.GET, produces = { "application/json","application/xml" })
-	public void adminService() 
-	{
-		System.out.println("Inside Admin");
+		return empDAO.getEmployeeAllDetails(empID);
 	}
 	
+	@RequestMapping(value = "/listemployees", method = RequestMethod.GET, produces = { "application/json","application/xml" })
+	public  ResponseEntity<List<EmployeeAllDetails>> empServiceAll() 
+	{
+		return empDAO.listAllEmployees();
+	}
+	
+	@RequestMapping(value = "/getemployeedetails/{empID}", method = RequestMethod.GET, produces = { "application/json","application/xml" })
+	public ResponseEntity<EmployeeDetailsEntity> empService(@PathVariable String empID, Authentication authentication) 
+	{
+		String uname = authentication.getName();
+		if(uname.equals(empID))
+		{
+			return empDAO.getEmployeeDetails(empID);
+		}
+		else
+			return new ResponseEntity("Not Authorised",HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/managerService/{manID}", method = RequestMethod.GET, produces = { "application/json","application/xml" })
+	public ResponseEntity<List<EmployeeAllDetails>> managerService(@PathVariable String manID) 
+	{
+		return empDAO.listManagerReporties(manID);
+	}
 }
- 
